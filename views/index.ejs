@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>test</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <div class="main_header">
+    <div class="center-div" style="animation: hbeat 1s linear infinite;" id="heart">
+      <div class="text-align">
+        <p class="rate" id="rate">50</p>
+      </div>
+    </div>
+    
+  </div>
+  <script>
+    var style = document.querySelector('.center-div').style;
+    style.setProperty('--color', 'hsl(0, 100%, 75%)');
+    let bpm;
+
+    async function httpGet(theUrl)
+    {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+
+    document.getElementById("heart").addEventListener("animationiteration", ()=>{
+      document.getElementById("rate").innerText = bpm
+      document.getElementById("heart").style.animation = "hbeat " + 60/bpm +"s linear infinite"
+      let color = ""
+      if (bpm < 60) {
+        color = 'hsl(0, 100%, 75%)'
+      } else if (bpm > 120) {
+        color = 'hsl(0, 100%, 40%)'
+      } else {
+        color = 'hsl(0, 100%, ' + Math.floor(100-((bpm*25)/60)) + '%)'
+      }
+      style.setProperty('--color', color);
+      console.log("animation ended")
+    })
+
+    async function updateBPM() {
+      bpm = await httpGet("http://localhost:3000/getbpm");
+      bpm = JSON.parse(bpm);
+      bpm = bpm["rate"];
+    }
+    setInterval(updateBPM, 500)
+  </script>
+</body>
+</html>
